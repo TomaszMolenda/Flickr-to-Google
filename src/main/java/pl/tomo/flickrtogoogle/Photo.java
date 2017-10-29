@@ -11,13 +11,15 @@ public class Photo {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
+    private String googleId;
     private String title;
 
     private Photo() {
 
     }
 
-    public Photo(String title) {
+    public Photo(String googleId, String title) {
+        this.googleId = googleId;
         this.title = title;
     }
 }
