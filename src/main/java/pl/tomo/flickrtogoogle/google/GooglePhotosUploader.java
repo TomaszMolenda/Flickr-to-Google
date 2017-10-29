@@ -1,4 +1,4 @@
-package pl.tomo.flickrtogoogle;
+package pl.tomo.flickrtogoogle.google;
 
 import com.google.gdata.client.photos.PicasawebService;
 import com.google.gdata.data.PlainTextConstruct;
@@ -14,7 +14,7 @@ import java.net.URL;
 
 @Service
 @Log
-class GooglePhotosUploader {
+public class GooglePhotosUploader {
 
     private static final String API_PREFIX = "https://picasaweb.google.com/data/feed/api/user/";
 
@@ -26,7 +26,7 @@ class GooglePhotosUploader {
     }
 
     @SneakyThrows
-    PhotoEntry upload() {
+    public PhotoEntry upload() {
 
         URL albumPostUrl = new URL(API_PREFIX + "default/albumid/1000000457195984");
 
