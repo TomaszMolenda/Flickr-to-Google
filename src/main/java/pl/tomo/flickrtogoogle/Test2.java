@@ -24,6 +24,7 @@ import com.google.gdata.data.photos.PhotoEntry;
 import com.google.gdata.data.photos.UserFeed;
 import com.google.gdata.util.Version;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -41,27 +42,11 @@ public class Test2 implements InitializingBean {
 
     private static final String API_PREFIX = "https://picasaweb.google.com/data/feed/api/user/";
 
+    @Autowired private PicasawebService picasawebService;
+
     @Override
     public void afterPropertiesSet() throws Exception {
 
-        HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
-        JacksonFactory jacksonFactory = JacksonFactory.getDefaultInstance();
-
-
-        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(jacksonFactory,
-                new InputStreamReader(new FileInputStream("/home/tomo/client_secret.json")));
-
-        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
-                httpTransport, jacksonFactory, clientSecrets,
-                Collections.singleton("https://picasaweb.google.com/data/")).setDataStoreFactory(new FileDataStoreFactory(new File("/home/tomo/accessToken")))
-                .setApprovalPrompt("force")
-                .setAccessType("offline")
-                .build();
-
-        Credential credential = new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
-
-        final PicasawebService service = new PicasawebService("tomo");
-        service.setOAuth2Credentials(credential);
 
         URL albumPostUrl = new URL(API_PREFIX + "default/albumid/1000000457195984");
 
@@ -74,7 +59,7 @@ public class Test2 implements InitializingBean {
         MediaFileSource myMedia = new MediaFileSource(new File("/home/tomo/kot2.jpeg"), "image/jpeg");
         myPhoto.setMediaSource(myMedia);
 
-        PhotoEntry returnedPhoto = service.insert(albumPostUrl, myPhoto);
+        PhotoEntry returnedPhoto = picasawebService.insert(albumPostUrl, myPhoto);
 
         System.out.println(returnedPhoto.getId());
     }
