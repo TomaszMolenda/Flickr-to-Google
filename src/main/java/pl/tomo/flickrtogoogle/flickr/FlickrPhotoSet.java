@@ -1,24 +1,27 @@
 package pl.tomo.flickrtogoogle.flickr;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import lombok.Getter;
+
+import javax.persistence.*;
 
 
 @Entity
+@Table(uniqueConstraints=
+@UniqueConstraint(columnNames = {"flickId", "name"}))
+@Getter
 public class FlickrPhotoSet {
 
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
+
     private String flickId;
+
     private String name;
 
-    private FlickrPhotoSet() {
-    }
+    private FlickrPhotoSet() {}
 
-    public FlickrPhotoSet(String flickId, String name) {
+    FlickrPhotoSet(String flickId, String name) {
         this.flickId = flickId;
         this.name = name;
     }

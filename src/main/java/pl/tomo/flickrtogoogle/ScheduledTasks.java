@@ -1,17 +1,14 @@
 package pl.tomo.flickrtogoogle;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import com.google.gdata.data.photos.PhotoEntry;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import pl.tomo.flickrtogoogle.flickr.FlickrUploader;
 import pl.tomo.flickrtogoogle.google.GooglePhotosUploader;
+
+import java.text.SimpleDateFormat;
 
 @Slf4j
 @Component
@@ -30,7 +27,7 @@ public class ScheduledTasks {
         this.flickrUploader = flickrUploader;
     }
 
-    @Scheduled(fixedRate = 5000)
+    @Scheduled(fixedRate = 50000000)
     public void reportCurrentTime() {
 
         byte[] flickrPhotos = flickrUploader.upload();
