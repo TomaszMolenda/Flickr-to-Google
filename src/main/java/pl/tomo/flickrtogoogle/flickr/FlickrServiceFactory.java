@@ -11,29 +11,26 @@ import lombok.SneakyThrows;
 import org.scribe.model.Token;
 import org.scribe.model.Verifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.util.Scanner;
 
-@Configuration
+@Service
 @PropertySource("classpath:/config.properties")
-class FlickrConfiguration {
+class FlickrServiceFactory {
 
     @Value("${flickr.api.key}") private String apiKey;
     @Value("${flickr.api.secret}") private String secret;
 
-    @Bean
-    @SneakyThrows
-    FlickrService flickrService() {
+    FlickrService create() {
 
         Flickr flickr = new Flickr(apiKey, secret, new REST());
-
         Auth auth = fetchAuth(flickr);
 
-        RequestContext.getRequestContext().setAuth(auth);
+        RequestContext requestContext = RequestContext.getRequestContext();
+        requestContext.setAuth(auth);
 
         return new FlickrService(flickr, auth);
     }
@@ -47,7 +44,7 @@ class FlickrConfiguration {
 
         if (auths.length > 0) {
 
-           return auths[0];
+            return auths[0];
         }
         return connectForToken(flickr, fileAuthStore);
     }
@@ -78,4 +75,6 @@ class FlickrConfiguration {
 
         return auth;
     }
+
+
 }
