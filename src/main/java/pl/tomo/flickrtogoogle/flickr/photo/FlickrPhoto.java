@@ -19,6 +19,7 @@ public class FlickrPhoto {
 
     private Date dateTaken;
 
+    @Getter
     private String title;
 
     FlickrPhoto() {

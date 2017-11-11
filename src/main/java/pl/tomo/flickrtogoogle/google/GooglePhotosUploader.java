@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
+import pl.tomo.flickrtogoogle.flickr.adapters.outgoing.DownloadedFlickr;
 
 import java.net.URL;
 
@@ -21,16 +22,16 @@ class GooglePhotosUploader {
     private final PicasawebService picasawebService;
 
     @SneakyThrows
-    PhotoEntry upload(byte[] bytes) {
+    PhotoEntry upload(DownloadedFlickr downloadedFlickr) {
 
         URL albumPostUrl = new URL(API_PREFIX + "default/albumid/1000000457195984");
 
         PhotoEntry photoEntry = new PhotoEntry();
-        photoEntry.setTitle(new PlainTextConstruct("Puppies FTW"));
-        photoEntry.setDescription(new PlainTextConstruct("Puppies are the greatest."));
-        photoEntry.setClient("myClientName");
+        photoEntry.setTitle(new PlainTextConstruct(downloadedFlickr.getTitle().getValue()));
+//        photoEntry.setDescription(new PlainTextConstruct(downloadedFlickr.getTitle().getValue()));
+//        photoEntry.setClient("myClientName");
 
-        MediaByteArraySource mediaSource = new MediaByteArraySource(bytes, "image/jpeg");
+        MediaByteArraySource mediaSource = new MediaByteArraySource(downloadedFlickr.getData(), "image/jpeg");
 
         photoEntry.setMediaSource(mediaSource);
 

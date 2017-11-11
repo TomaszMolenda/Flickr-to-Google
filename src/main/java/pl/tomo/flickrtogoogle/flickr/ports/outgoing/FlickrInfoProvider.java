@@ -1,4 +1,4 @@
-package pl.tomo.flickrtogoogle.flickr.service;
+package pl.tomo.flickrtogoogle.flickr.ports.outgoing;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,7 +12,7 @@ import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
-public class FlickrIdProvider {
+public class FlickrInfoProvider {
 
     private final FlickrPhotoRepository flickrPhotoRepository;
 
