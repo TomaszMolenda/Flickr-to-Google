@@ -1,89 +1,55 @@
 package pl.tomo.flickrtogoogle.flickr.photo;
 
-import com.flickr4java.flickr.Flickr;
 import com.flickr4java.flickr.photos.Photo;
+import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.java.Log;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import pl.tomo.flickrtogoogle.flickr.service.FlickrService;
 import pl.tomo.flickrtogoogle.flickr.service.FlickrServiceCreator;
-import pl.tomo.flickrtogoogle.flickr.set.FlickrPhotoSet;
-import pl.tomo.flickrtogoogle.flickr.set.FlickrPhotoSetExtractor;
-import pl.tomo.flickrtogoogle.flickr.set.FlickrPhotoSetRepository;
-import pl.tomo.flickrtogoogle.flickr.set.dto.FlickrPhotoSetDto;
 
 import java.util.List;
 
 @Service
 @Log
-public class FlickrPhotoCreator {
+@RequiredArgsConstructor
+class FlickrPhotoCreator {
 
-    private final FlickrPhotoSetExtractor flickrPhotoSetExtractor;
+    private static final int PER_PAGE = 100;
+
     private final FlickrServiceCreator flickrServiceCreator;
-    private final FlickrPhotoFactory flickrPhotoFactory;
-    private final FlickrPhotoExistChecker flickrPhotoExistChecker;
-    private final FlickrPhotoRepository flickrPhotoRepository;
-    private final FlickrPhotoSetRepository flickrPhotoSetRepository;
-    private final OverLoopDownloader overLoopDownloader;
+    private final FlickrPhotoSaver flickrPhotoSaver;
 
-    @Autowired
-    FlickrPhotoCreator(FlickrPhotoSetExtractor flickrPhotoSetExtractor, FlickrServiceCreator flickrServiceCreator, FlickrPhotoFactory flickrPhotoFactory, FlickrPhotoExistChecker flickrPhotoExistChecker, FlickrPhotoRepository flickrPhotoRepository, FlickrPhotoSetRepository flickrPhotoSetRepository, OverLoopDownloader overLoopDownloader) {
-        this.flickrPhotoSetExtractor = flickrPhotoSetExtractor;
-        this.flickrServiceCreator = flickrServiceCreator;
-        this.flickrPhotoFactory = flickrPhotoFactory;
-        this.flickrPhotoExistChecker = flickrPhotoExistChecker;
-        this.flickrPhotoRepository = flickrPhotoRepository;
-        this.flickrPhotoSetRepository = flickrPhotoSetRepository;
-        this.overLoopDownloader = overLoopDownloader;
+    @Scheduled(fixedRate = 50000000)
+    private void create() {
+
+        final FlickrService flickrService = flickrServiceCreator.create();
+
+        int downloaded;
+        int page = 1;
+
+        do {
+
+            final List<Photo> photos = download(flickrService, page);
+
+            downloaded = photos.size();
+            log.info("Download photos " + photos.size());
+
+            flickrPhotoSaver.save(photos);
+
+            page++;
+
+        } while (downloaded == PER_PAGE);
     }
 
+    @SneakyThrows
+    private List<Photo> download(FlickrService flickrService, int page) {
 
-    public void create() {
+        log.info("Downloading photos from page " + page);
 
-        final Flickr flickr = flickrServiceCreator.create().getFlickr();
+        AllPhotosInterface allPhotosInterface = new AllPhotosInterface(flickrService);
 
-        flickrPhotoSetExtractor.extractPhotoSets()
-                .stream()
-//                .filter(this::notCompleteDownload)
-                .forEach(flickrPhotoSetDto -> create(flickrPhotoSetDto, flickr));
-    }
-
-    private boolean notCompleteDownload(FlickrPhotoSetDto flickrPhotoSetDto) {
-
-        return flickrPhotoSetDto.getMediaCount() != flickrPhotoSetDto.getFlickrPhotosIds().size();
-    }
-
-    private void create(FlickrPhotoSetDto flickrPhotoSetDto, Flickr flickr) {
-
-        final List<Photo> photos = overLoopDownloader.download(flickr, flickrPhotoSetDto);
-
-        for (Photo photo : photos) {
-
-            final FlickrPhoto flickrPhoto = flickrPhotoFactory.create(photo);
-
-            if (flickrPhotoExistChecker.notExist(flickrPhoto)) {
-
-                save(flickrPhoto, flickrPhotoSetDto);
-            }
-
-        }
-
-//        flickPhotoDownloader.download(flickr, flickrPhotoSetDto)
-//                .stream()
-//                .map(flickrPhotoFactory::create)
-//                .filter(flickrPhotoExistChecker::notExist)
-//                .forEach(flickrPhoto -> save(flickrPhoto, flickrPhotoSetDto));
-    }
-
-    private void save(FlickrPhoto flickrPhoto, FlickrPhotoSetDto flickrPhotoSetDto) {
-
-        log.info("Save photo " + flickrPhoto.getFlickrId() + ", in photoset " + flickrPhotoSetDto.getFlickrId());
-
-        flickrPhotoRepository.save(flickrPhoto);
-
-        final FlickrPhotoSet flickrPhotoSet = flickrPhotoSetRepository.findFirstByFlickrId(flickrPhotoSetDto.getFlickrId());
-
-        flickrPhotoSet.addPhoto(flickrPhoto);
-
-        flickrPhotoSetRepository.save(flickrPhotoSet);
+        return allPhotosInterface.getAll(PER_PAGE, page);
     }
 }

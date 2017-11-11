@@ -3,14 +3,12 @@ package pl.tomo.flickrtogoogle.google;
 import com.google.gdata.client.photos.PicasawebService;
 import com.google.gdata.data.PlainTextConstruct;
 import com.google.gdata.data.media.MediaByteArraySource;
-import com.google.gdata.data.media.MediaFileSource;
 import com.google.gdata.data.photos.PhotoEntry;
 import lombok.SneakyThrows;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.net.URL;
 
 @Service
@@ -27,7 +25,7 @@ public class GooglePhotosUploader {
     }
 
     @SneakyThrows
-    public PhotoEntry upload(byte[] flickrPhotos) {
+    public PhotoEntry upload(byte[] bytes) {
 
         URL albumPostUrl = new URL(API_PREFIX + "default/albumid/1000000457195984");
 
@@ -36,7 +34,7 @@ public class GooglePhotosUploader {
         photoEntry.setDescription(new PlainTextConstruct("Puppies are the greatest."));
         photoEntry.setClient("myClientName");
 
-        MediaByteArraySource mediaSource = new MediaByteArraySource(flickrPhotos, "image/jpeg");
+        MediaByteArraySource mediaSource = new MediaByteArraySource(bytes, "image/jpeg");
 
         photoEntry.setMediaSource(mediaSource);
 
