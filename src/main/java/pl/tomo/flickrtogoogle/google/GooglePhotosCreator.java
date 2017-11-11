@@ -8,12 +8,9 @@ import lombok.SneakyThrows;
 import lombok.extern.java.Log;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import pl.tomo.flickrtogoogle.flickr.FlickrId;
 import pl.tomo.flickrtogoogle.flickr.adapters.outgoing.DownloadedFlickr;
 import pl.tomo.flickrtogoogle.flickr.ports.outgoing.FlickrInfoProvider;
 import pl.tomo.flickrtogoogle.flickr.ports.outgoing.FlickrPhotoDownloader;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -28,20 +25,21 @@ class GooglePhotosCreator {
     @Scheduled(fixedRate = 50000000)
     private void create() {
 
-        List<FlickrId> flickrPhotosIds = flickrInfoProvider.fetchPhotosIds();
-
-        final DownloadedFlickr downloadedFlickr = flickrPhotoDownloader.download(flickrPhotosIds.get(0));
-
-        PhotoEntry photoEntry = upload(downloadedFlickr);
-
-        log.info("Successfully upload photo to google " + photoEntry.getId());
+        flickrInfoProvider.fetchPhotosIds().stream()
+                .limit(100)
+                .map(flickrPhotoDownloader::download)
+                .forEach(this::upload);
     }
 
     private PhotoEntry upload(DownloadedFlickr downloadedFlickr) {
 
         try {
 
-            return googlePhotosUploader.upload(downloadedFlickr);
+            final PhotoEntry photoEntry = googlePhotosUploader.upload(downloadedFlickr);
+
+            log.info("Successfully upload photo to google " + photoEntry.getId());
+
+            return photoEntry;
 
         } catch (Exception e) {
 
