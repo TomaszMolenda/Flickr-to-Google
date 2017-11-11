@@ -1,11 +1,9 @@
 package pl.tomo.flickrtogoogle.flickr.photo;
 
 import lombok.Getter;
+import pl.tomo.flickrtogoogle.flickr.FlickrId;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Date;
 
 @Entity
@@ -16,7 +14,8 @@ public class FlickrPhoto {
     private Long id;
 
     @Getter
-    private String flickrId;
+    @Embedded
+    private FlickrId flickrId;
 
     private Date dateTaken;
 
@@ -25,7 +24,7 @@ public class FlickrPhoto {
     FlickrPhoto() {
     }
 
-    FlickrPhoto(String flickrId, Date dateTaken, String title) {
+    FlickrPhoto(FlickrId flickrId, Date dateTaken, String title) {
 
         this.flickrId = flickrId;
         this.dateTaken = dateTaken;
