@@ -1,13 +1,16 @@
 package pl.tomo.flickrtogoogle;
 
+import com.google.api.client.auth.oauth2.Credential;
 import com.google.gdata.data.photos.PhotoEntry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import pl.tomo.flickrtogoogle.flickr.FlickrUploader;
+import pl.tomo.flickrtogoogle.flickr.photo.FlickrPhotoCreator;
+import pl.tomo.flickrtogoogle.flickr.set.FlickrPhotoSetCreator;
 import pl.tomo.flickrtogoogle.google.GooglePhotosUploader;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 
 @Slf4j
@@ -18,28 +21,50 @@ public class ScheduledTasks {
 
     private final GooglePhotosUploader googlePhotosUploader;
     private final PhotoRepository photoRepository;
-    private final FlickrUploader flickrUploader;
+    private final FlickrPhotoSetCreator flickrPhotoSetCreator;
+    private final FlickrPhotoCreator flickrPhotoCreator;
+    private final Credential credential;
 
     @Autowired
-    public ScheduledTasks(GooglePhotosUploader googlePhotosUploader, PhotoRepository photoRepository, FlickrUploader flickrUploader) {
+    public ScheduledTasks(GooglePhotosUploader googlePhotosUploader, PhotoRepository photoRepository, FlickrPhotoSetCreator flickrPhotoSetCreator, FlickrPhotoCreator flickrPhotoCreator, Credential credential) {
         this.googlePhotosUploader = googlePhotosUploader;
         this.photoRepository = photoRepository;
-        this.flickrUploader = flickrUploader;
+        this.flickrPhotoSetCreator = flickrPhotoSetCreator;
+        this.flickrPhotoCreator = flickrPhotoCreator;
+        this.credential = credential;
     }
 
     @Scheduled(fixedRate = 50000000)
     public void reportCurrentTime() {
 
-        byte[] flickrPhotos = flickrUploader.upload();
+        flickrPhotoSetCreator.create();
+        flickrPhotoCreator.create();
+
+        byte[] flickrPhotos = new byte[]{1};
 
         log.info("Photos in database: {}", photoRepository.count());
 
-        PhotoEntry photoEntry = googlePhotosUploader.upload(flickrPhotos);
+        try {
 
-        Photo photo = new Photo(photoEntry.getId(), photoEntry.getTitle().getPlainText());
+            PhotoEntry photoEntry = googlePhotosUploader.upload(flickrPhotos);
+        } catch (Exception e) {
 
-        photoRepository.save(photo);
+            if (e.getMessage().equals("Forbidden")) {
 
-        log.info("Photo id: {}", photoEntry.getId());
+                try {
+                    credential.refreshToken();
+                    googlePhotosUploader.upload(flickrPhotos);
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
+
+        }
+
+//        Photo photo = new Photo(photoEntry.getId(), photoEntry.getTitle().getPlainText());
+//
+//        photoRepository.save(photo);
+//
+//        log.info("Photo id: {}", photoEntry.getId());
     }
 }

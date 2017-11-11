@@ -1,4 +1,4 @@
-package pl.tomo.flickrtogoogle.flickr;
+package pl.tomo.flickrtogoogle.flickr.service;
 
 import com.flickr4java.flickr.Flickr;
 import com.flickr4java.flickr.REST;
@@ -19,12 +19,13 @@ import java.util.Scanner;
 
 @Service
 @PropertySource("classpath:/config.properties")
-class FlickrServiceFactory {
+class FlickrServiceFactory implements FlickrServiceCreator {
 
     @Value("${flickr.api.key}") private String apiKey;
     @Value("${flickr.api.secret}") private String secret;
 
-    FlickrService create() {
+    @Override
+    public FlickrService create() {
 
         Flickr flickr = new Flickr(apiKey, secret, new REST());
         Auth auth = fetchAuth(flickr);
