@@ -8,4 +8,6 @@ public interface DownloadedFlickr {
     FlickrId getFlickrId();
     Title getTitle();
     byte[] getData();
+    MediaType getMediaType();
+    boolean isPhoto();
 }

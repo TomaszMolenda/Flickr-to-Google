@@ -1,6 +1,7 @@
 package pl.tomo.flickrtogoogle.google;
 
 import com.google.gdata.client.photos.PicasawebService;
+import com.google.gdata.data.DateTime;
 import com.google.gdata.data.PlainTextConstruct;
 import com.google.gdata.data.media.MediaByteArraySource;
 import com.google.gdata.data.photos.PhotoEntry;
@@ -26,14 +27,16 @@ class GooglePhotosUploader {
 
         URL albumPostUrl = new URL(API_PREFIX + "default/albumid/1000000457195984");
 
+        MediaByteArraySource mediaSource = new MediaByteArraySource(downloadedFlickr.getData(), downloadedFlickr.getMediaType().value());
+
         PhotoEntry photoEntry = new PhotoEntry();
         photoEntry.setTitle(new PlainTextConstruct(downloadedFlickr.getTitle().getValue()));
-//        photoEntry.setDescription(new PlainTextConstruct(downloadedFlickr.getTitle().getValue()));
-//        photoEntry.setClient("myClientName");
-
-        MediaByteArraySource mediaSource = new MediaByteArraySource(downloadedFlickr.getData(), "image/jpeg");
+        photoEntry.setUpdated(DateTime.now());
+        photoEntry.setPublished(DateTime.now());
 
         photoEntry.setMediaSource(mediaSource);
+
+        log.info(String.format("Uploading media to google, flickrId: %s", downloadedFlickr.getFlickrId().getId()));
 
         return picasawebService.insert(albumPostUrl, photoEntry);
     }

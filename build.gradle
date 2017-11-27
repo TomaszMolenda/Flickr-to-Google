@@ -38,6 +38,8 @@ dependencies {
 	compile group: 'com.flickr4java', name: 'flickr4java', version: '2.17'
 	compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
 	compile group: 'commons-io', name: 'commons-io', version: '2.5'
+	compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.3'
+
 
 
 }

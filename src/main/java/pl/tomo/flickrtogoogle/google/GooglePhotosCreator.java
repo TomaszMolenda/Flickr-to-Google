@@ -28,10 +28,11 @@ class GooglePhotosCreator {
         flickrInfoProvider.fetchPhotosIds().stream()
                 .limit(100)
                 .map(flickrPhotoDownloader::download)
+                .filter(DownloadedFlickr::isPhoto)
                 .forEach(this::upload);
     }
 
-    private PhotoEntry upload(DownloadedFlickr downloadedFlickr) {
+    private void upload(DownloadedFlickr downloadedFlickr) {
 
         try {
 
@@ -39,7 +40,7 @@ class GooglePhotosCreator {
 
             log.info("Successfully upload photo to google " + photoEntry.getId());
 
-            return photoEntry;
+            return;
 
         } catch (Exception e) {
 
@@ -47,7 +48,7 @@ class GooglePhotosCreator {
 
                 refreshToken();
 
-                return upload(downloadedFlickr);
+                upload(downloadedFlickr);
             }
         }
 

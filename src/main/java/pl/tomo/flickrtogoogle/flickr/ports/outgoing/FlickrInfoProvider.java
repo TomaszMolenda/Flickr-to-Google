@@ -19,6 +19,7 @@ public class FlickrInfoProvider {
     public List<FlickrId> fetchPhotosIds() {
 
         return StreamSupport.stream(flickrPhotoRepository.findAll().spliterator(), false)
+                .filter(flickrPhoto -> flickrPhoto.getFlickrId().getId().equalsIgnoreCase("24337751308"))
                 .map(FlickrPhoto::getFlickrId)
                 .collect(Collectors.toList());
     }

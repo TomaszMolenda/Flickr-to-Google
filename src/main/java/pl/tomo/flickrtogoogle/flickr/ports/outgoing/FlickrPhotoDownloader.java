@@ -11,7 +11,9 @@ import org.springframework.stereotype.Service;
 import pl.tomo.flickrtogoogle.flickr.FlickrId;
 import pl.tomo.flickrtogoogle.flickr.Title;
 import pl.tomo.flickrtogoogle.flickr.adapters.outgoing.DownloadedFlickr;
+import pl.tomo.flickrtogoogle.flickr.adapters.outgoing.MediaType;
 import pl.tomo.flickrtogoogle.flickr.service.FlickrServiceCreator;
+import pl.tomo.flickrtogoogle.flickr.service.FlickrVideoMarker;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +21,7 @@ import pl.tomo.flickrtogoogle.flickr.service.FlickrServiceCreator;
 public class FlickrPhotoDownloader {
 
     private final FlickrServiceCreator flickrServiceCreator;
+    private final FlickrVideoMarker flickrVideoMarker;
 
     @SneakyThrows
     public DownloadedFlickr download(FlickrId flickrId) {
@@ -29,29 +32,32 @@ public class FlickrPhotoDownloader {
 
         final Photo photo = photosInterface.getPhoto(flickrId.getId());
 
-        log.info("Download original photo with id" + photo.getId());
+        return downloadMediaData(photo, flickrId);
+    }
 
-        final byte[] bytes = IOUtils.toByteArray(photosInterface.getImageAsStream(photo, Size.ORIGINAL));
+    @SneakyThrows
+    private DownloadedFlickr downloadMediaData(Photo photo, FlickrId flickrId) {
 
-        return new DownloadedFlickr() {
+        final PhotosInterface photosInterface = flickrServiceCreator.create().getFlickr().getPhotosInterface();
 
-            @Override
-            public FlickrId getFlickrId() {
+        if (isVideo(photo)) {
 
-                return flickrId;
-            }
+            flickrVideoMarker.mark(flickrId);
 
-            @Override
-            public Title getTitle() {
+            return new FlickrVideo();
 
-                return new Title(photo.getTitle());
-            }
+        } else {
 
-            @Override
-            public byte[] getData() {
+            final byte[] bytes = IOUtils.toByteArray(photosInterface.getImageAsStream(photo, Size.ORIGINAL));
 
-                return bytes;
-            }
-        };
+            log.info(String.format("Download photo from flickr, title: %s, id: %s, lastModified: %tc", photo.getTitle(), photo.getId(), photo.getDateTaken()));
+
+            return new FlickrPhoto(flickrId, new Title(photo.getTitle()), bytes, MediaType.PHOTO);
+        }
+    }
+
+    private boolean isVideo(Photo photo) {
+
+        return photo.getMedia().equals("video");
     }
 }
