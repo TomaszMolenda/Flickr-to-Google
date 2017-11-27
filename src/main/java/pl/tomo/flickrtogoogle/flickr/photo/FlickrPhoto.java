@@ -25,6 +25,10 @@ public class FlickrPhoto {
 
     private MediaType mediaType;
 
+    private String problem;
+
+    private Boolean uploaded;
+
     FlickrPhoto() {
     }
 
@@ -37,5 +41,25 @@ public class FlickrPhoto {
 
     public void markVideo() {
         mediaType = MediaType.VIDEO;
+    }
+
+    public void markProblem(String problem) {
+
+        this.problem = problem;
+    }
+
+    public void markUploaded() {
+
+        uploaded = true;
+    }
+
+    public boolean nonUploaded() {
+
+        if (uploaded == null) {
+
+            return true;
+        }
+
+        return !uploaded;
     }
 }

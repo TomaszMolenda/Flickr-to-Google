@@ -2,7 +2,6 @@ package pl.tomo.flickrtogoogle.google;
 
 
 import com.google.api.client.auth.oauth2.Credential;
-import com.google.gdata.data.photos.PhotoEntry;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.java.Log;
@@ -11,6 +10,7 @@ import org.springframework.stereotype.Service;
 import pl.tomo.flickrtogoogle.flickr.adapters.outgoing.DownloadedFlickr;
 import pl.tomo.flickrtogoogle.flickr.ports.outgoing.FlickrInfoProvider;
 import pl.tomo.flickrtogoogle.flickr.ports.outgoing.FlickrPhotoDownloader;
+import pl.tomo.flickrtogoogle.flickr.service.FlickrMediaMarker;
 
 @Service
 @RequiredArgsConstructor
@@ -21,8 +21,9 @@ class GooglePhotosCreator {
     private final FlickrPhotoDownloader flickrPhotoDownloader;
     private final GooglePhotosUploader googlePhotosUploader;
     private final Credential credential;
+    private final FlickrMediaMarker flickrMediaMarker;
 
-    @Scheduled(fixedRate = 50000000)
+    @Scheduled(fixedRate = 1000)
     private void create() {
 
         flickrInfoProvider.fetchPhotosIds().stream()
@@ -36,9 +37,9 @@ class GooglePhotosCreator {
 
         try {
 
-            final PhotoEntry photoEntry = googlePhotosUploader.upload(downloadedFlickr);
+            googlePhotosUploader.upload(downloadedFlickr);
 
-            log.info("Successfully upload photo to google " + photoEntry.getId());
+            flickrMediaMarker.markUploaded(downloadedFlickr.getFlickrId());
 
             return;
 

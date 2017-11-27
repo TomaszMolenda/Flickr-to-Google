@@ -1,5 +1,8 @@
 package pl.tomo.flickrtogoogle.flickr.ports.outgoing;
 
+import com.drew.imaging.ImageMetadataReader;
+import com.drew.metadata.Metadata;
+import com.drew.metadata.exif.ExifSubIFDDirectory;
 import com.flickr4java.flickr.photos.Photo;
 import com.flickr4java.flickr.photos.PhotosInterface;
 import com.flickr4java.flickr.photos.Size;
@@ -12,8 +15,12 @@ import pl.tomo.flickrtogoogle.flickr.FlickrId;
 import pl.tomo.flickrtogoogle.flickr.Title;
 import pl.tomo.flickrtogoogle.flickr.adapters.outgoing.DownloadedFlickr;
 import pl.tomo.flickrtogoogle.flickr.adapters.outgoing.MediaType;
+import pl.tomo.flickrtogoogle.flickr.service.FlickrMediaMarker;
 import pl.tomo.flickrtogoogle.flickr.service.FlickrServiceCreator;
-import pl.tomo.flickrtogoogle.flickr.service.FlickrVideoMarker;
+
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 
 @Service
 @RequiredArgsConstructor
@@ -21,7 +28,7 @@ import pl.tomo.flickrtogoogle.flickr.service.FlickrVideoMarker;
 public class FlickrPhotoDownloader {
 
     private final FlickrServiceCreator flickrServiceCreator;
-    private final FlickrVideoMarker flickrVideoMarker;
+    private final FlickrMediaMarker flickrMediaMarker;
 
     @SneakyThrows
     public DownloadedFlickr download(FlickrId flickrId) {
@@ -42,7 +49,7 @@ public class FlickrPhotoDownloader {
 
         if (isVideo(photo)) {
 
-            flickrVideoMarker.mark(flickrId);
+            flickrMediaMarker.markVideo(flickrId);
 
             return new FlickrVideo();
 
@@ -50,7 +57,20 @@ public class FlickrPhotoDownloader {
 
             final byte[] bytes = IOUtils.toByteArray(photosInterface.getImageAsStream(photo, Size.ORIGINAL));
 
-            log.info(String.format("Download photo from flickr, title: %s, id: %s, lastModified: %tc", photo.getTitle(), photo.getId(), photo.getDateTaken()));
+            final InputStream inputStream = new ByteArrayInputStream(bytes);
+            final BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
+            final Metadata metadata = ImageMetadataReader.readMetadata(bufferedInputStream);
+
+            ExifSubIFDDirectory directory = metadata.getFirstDirectoryOfType(ExifSubIFDDirectory.class);
+
+            if (directory == null) {
+
+                flickrMediaMarker.markNonDate(flickrId);
+
+                return new NonDateFlickrPhoto();
+            }
+
+            log.info(String.format("Download photo from flickr, title: %s, id: %s", photo.getTitle(), photo.getId()));
 
             return new FlickrPhoto(flickrId, new Title(photo.getTitle()), bytes, MediaType.PHOTO);
         }
