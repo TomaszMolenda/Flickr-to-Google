@@ -13,7 +13,6 @@ buildscript {
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
-apply plugin: 'war'
 
 group = 'pl.tomo'
 version = '0.0.1-SNAPSHOT'
@@ -40,7 +39,4 @@ dependencies {
 	compile group: 'commons-io', name: 'commons-io', version: '2.5'
 	compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.3'
     compile group: 'com.drewnoakes', name: 'metadata-extractor', version: '2.11.0'
-
-
-
 }
