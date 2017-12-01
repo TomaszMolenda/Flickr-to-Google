@@ -40,7 +40,7 @@ class GoogleConfiguration {
     GoogleClientSecrets googleClientSecrets(JacksonFactory jacksonFactory) {
 
         return GoogleClientSecrets.load(jacksonFactory,
-                new InputStreamReader(new FileInputStream("/home/tomo/client_secret.json")));
+                new InputStreamReader(new FileInputStream("client_secret.json")));
     }
 
     @Bean
