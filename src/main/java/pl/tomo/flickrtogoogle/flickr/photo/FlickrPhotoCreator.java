@@ -4,6 +4,7 @@ import com.flickr4java.flickr.photos.Photo;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.java.Log;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import pl.tomo.flickrtogoogle.flickr.service.FlickrService;
 import pl.tomo.flickrtogoogle.flickr.service.FlickrServiceCreator;
@@ -20,7 +21,7 @@ class FlickrPhotoCreator {
     private final FlickrServiceCreator flickrServiceCreator;
     private final FlickrPhotoSaver flickrPhotoSaver;
 
-//    @Scheduled(fixedRate = 50000000)
+    @Scheduled(fixedRate = 5000)
     private void create() {
 
         final FlickrService flickrService = flickrServiceCreator.create();

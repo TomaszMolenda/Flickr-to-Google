@@ -39,7 +39,7 @@ class FlickrServiceFactory implements FlickrServiceCreator {
     @SneakyThrows
     private Auth fetchAuth(Flickr flickr) {
 
-        FileAuthStore fileAuthStore = new FileAuthStore(new File("/home/tomo/accessTokenFlickr"));
+        FileAuthStore fileAuthStore = new FileAuthStore(new File("accessTokenFlickr"));
 
         Auth[] auths = fileAuthStore.retrieveAll();
 

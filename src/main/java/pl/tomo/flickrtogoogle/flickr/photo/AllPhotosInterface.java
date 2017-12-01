@@ -25,7 +25,7 @@ public class AllPhotosInterface extends PhotosInterface {
     private final String userId;
     private final Flickr flickr;
 
-    public AllPhotosInterface(FlickrService flickrService) {
+    AllPhotosInterface(FlickrService flickrService) {
 
         super(flickrService.getFlickr().getApiKey(),
                 flickrService.getFlickr().getSharedSecret(),
