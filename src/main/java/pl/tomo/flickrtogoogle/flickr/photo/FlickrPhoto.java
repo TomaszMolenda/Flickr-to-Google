@@ -1,6 +1,7 @@
 package pl.tomo.flickrtogoogle.flickr.photo;
 
 import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
 import pl.tomo.flickrtogoogle.flickr.FlickrId;
 import pl.tomo.flickrtogoogle.flickr.adapters.outgoing.MediaType;
 
@@ -61,5 +62,15 @@ public class FlickrPhoto {
         }
 
         return !uploaded;
+    }
+
+    public boolean isNotVideo() {
+
+        return mediaType != MediaType.VIDEO;
+    }
+
+    public boolean doesNotHaveProblem() {
+
+        return StringUtils.isNotEmpty(problem);
     }
 }

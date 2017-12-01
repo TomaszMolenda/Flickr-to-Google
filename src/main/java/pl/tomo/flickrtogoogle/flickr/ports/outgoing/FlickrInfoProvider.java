@@ -20,6 +20,8 @@ public class FlickrInfoProvider {
 
         return StreamSupport.stream(flickrPhotoRepository.findAll().spliterator(), false)
                 .filter(FlickrPhoto::nonUploaded)
+                .filter(FlickrPhoto::isNotVideo)
+                .filter(FlickrPhoto::doesNotHaveProblem)
                 .map(FlickrPhoto::getFlickrId)
                 .collect(Collectors.toList());
     }
