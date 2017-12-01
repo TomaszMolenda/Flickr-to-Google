@@ -9,6 +9,7 @@ accessTokenFlickr/
 flicktogoogle.db.mv.db
 flicktogoogle.mv.db
 app.log
+client_secret.json
 gradle/
 out/
 
