@@ -27,10 +27,6 @@ class FlickrPhotoSaver {
                 flickrPhotoRepository.save(flickrPhoto);
 
                 log.info("FlickrPhoto saved, id: " + flickrPhoto.getFlickrId());
-
-            } else {
-
-                throw new RuntimeException("Stop download - every photos downloaded");
             }
         }
     }
