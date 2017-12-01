@@ -26,7 +26,7 @@ class FlickrPhotoSaver {
 
                 flickrPhotoRepository.save(flickrPhoto);
 
-                log.info("FlickrPhoto saved, id: " + flickrPhoto.getFlickrId());
+                log.info("FlickrPhoto saved, id: " + flickrPhoto.getFlickrId().getId());
             }
         }
     }
