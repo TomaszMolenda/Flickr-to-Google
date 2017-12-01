@@ -4,6 +4,13 @@ gradlew.bat
 /build/
 !gradle/wrapper/gradle-wrapper.jar
 
+accessTokenGoogle/
+accessTokenFlickr/
+flicktogoogle.db.mv.db
+flicktogoogle.mv.db
+gradle/
+out/
+
 ### STS ###
 .apt_generated
 .classpath

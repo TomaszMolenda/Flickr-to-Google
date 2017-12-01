@@ -52,7 +52,7 @@ class GoogleConfiguration {
         return new GoogleAuthorizationCodeFlow.Builder(
                 httpTransport, jacksonFactory, googleClientSecrets,
                 Collections.singleton("https://picasaweb.google.com/data/"))
-                .setDataStoreFactory(new FileDataStoreFactory(new File("accessToken")))
+                .setDataStoreFactory(new FileDataStoreFactory(new File("accessTokenGoogle")))
                 .setApprovalPrompt("force")
                 .setAccessType("offline")
                 .build();
