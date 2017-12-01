@@ -8,6 +8,7 @@ accessTokenGoogle/
 accessTokenFlickr/
 flicktogoogle.db.mv.db
 flicktogoogle.mv.db
+app.log
 gradle/
 out/
 
