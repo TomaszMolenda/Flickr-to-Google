@@ -71,6 +71,6 @@ public class FlickrPhoto {
 
     public boolean doesNotHaveProblem() {
 
-        return StringUtils.isNotEmpty(problem);
+        return StringUtils.isEmpty(problem);
     }
 }
